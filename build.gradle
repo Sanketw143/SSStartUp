@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+    //id 'com.jfrog.artifactory' version '4.33.3' // JFrog plugin
+    id 'maven-publish'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = 'artifactory'
+        url = uri('https://your-artifactory-domain/artifactory/libs-release') // Adjust URL
+        credentials {
+            username = project.findProperty("artifactory_user") ?: System.getenv("ARTIFACTORY_USER")
+            password = project.findProperty("artifactory_password") ?: System.getenv("ARTIFACTORY_PASSWORD")
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    runtimeOnly 'com.h2database:h2' // For in-memory DB during development
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+//artifactory {
+//    contextUrl = 'https://your-artifactory-domain/artifactory'  // Adjust URL
+//    publish {
+//        repository {
+//            repoKey = 'libs-release-local'  // Or your target repo
+//            username = project.findProperty("artifactory_user") ?: System.getenv("ARTIFACTORY_USER")
+//            password = project.findProperty("artifactory_password") ?: System.getenv("ARTIFACTORY_PASSWORD")
+//        }
+//        defaults {
+//            publications('mavenJava')
+//        }
+//    }
+//}

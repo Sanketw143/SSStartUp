@@ -1,4 +1,4 @@
-package org.ssupstart.datastructure.LinkedList;
+package org.ssupstart.datastructure.linkedList;
 
 public class LinkedListOne {
 

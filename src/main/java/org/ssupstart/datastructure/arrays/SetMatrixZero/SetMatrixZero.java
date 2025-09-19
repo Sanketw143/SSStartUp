@@ -1,4 +1,4 @@
-package org.ssupstart.datastructure.Arrays.SetMatrixZero;
+package org.ssupstart.datastructure.arrays.SetMatrixZero;
 
 import java.util.ArrayList;
 

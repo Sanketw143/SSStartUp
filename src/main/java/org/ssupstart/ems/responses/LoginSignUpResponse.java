@@ -13,4 +13,6 @@ public class LoginSignUpResponse {
     private String userName;
     private String action;
     private boolean isSuccess;
+    private String sessionToken;
+    private String generatedOtp;
 }

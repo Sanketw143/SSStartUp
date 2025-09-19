@@ -1,4 +1,4 @@
-package org.ssupstart.datastructure.Arrays.MaxSubArray;
+package org.ssupstart.datastructure.arrays.MaxSubArray;
 
 public class MaximumSubArraySumInAnArray {
     public static void main(String[] args) {

@@ -1,12 +1,12 @@
-package org.ssupstart.datastructure.Arrays.BuySellStock;
+package org.ssupstart.datastructure.arrays.buysellstock;
 
-import org.ssupstart.Main;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class BuySellStock {
     public static void main(String[] args) {
         int [] arr = {7,1,5,3,6,4};
-        int maxProfit = getMaxProfit(arr);
-        System.out.println(maxProfit);
+        log.info("final {}",getMaxProfit(arr));
     }
 
     private static int getMaxProfit(int[] arr) {

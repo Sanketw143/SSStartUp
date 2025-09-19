@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ssupstart.constants.APIPathConstants;
+import org.ssupstart.constants.ExceptionsConstants;
+import org.ssupstart.ems.requests.LoginRequest;
+import org.ssupstart.ems.requests.OtpVerifyRequest;
 import org.ssupstart.ems.requests.SignUpRequest;
 import org.ssupstart.ems.responses.APIResponse;
 import org.ssupstart.ems.responses.LoginSignUpResponse;
@@ -22,12 +25,30 @@ public class LoginAndSignUpController {
     LoginAndSignUpService loginAndSignUpService;
 
     @PostMapping(APIPathConstants.SIGN_UP_PATH)
-    public ResponseEntity<APIResponse<LoginSignUpResponse>> signupController(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<APIResponse<LoginSignUpResponse>> signupAction(@Valid @RequestBody SignUpRequest signUpRequest) {
         LoginSignUpResponse response = loginAndSignUpService.signUpEmployee(signUpRequest);
         if(response.isSuccess()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(new APIResponse<>(response, "Employee successfully created", true));
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new APIResponse<>(response, response.getAction(), false));
         }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new APIResponse<>(response, ExceptionsConstants.SOMETHING_WENT_WRONG,false));
     }
+
+    @PostMapping(APIPathConstants.LOGIN_PATH)
+    public ResponseEntity<APIResponse<LoginSignUpResponse>> loginAction(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginSignUpResponse response = loginAndSignUpService.loginEmployee(loginRequest);
+        if(response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new APIResponse<>(response, "Employee successfully created", true));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new APIResponse<>(response, ExceptionsConstants.SOMETHING_WENT_WRONG,false));
+    }
+
+    @PostMapping(APIPathConstants.VERIFY_OTP)
+    public ResponseEntity<APIResponse<LoginSignUpResponse>> verifyOtp(@Valid @RequestBody OtpVerifyRequest otpVerifyRequest) {
+        LoginSignUpResponse response = loginAndSignUpService.verifyOtp(otpVerifyRequest);
+        if(response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new APIResponse<>(response, "Employee successfully created", true));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new APIResponse<>(response, ExceptionsConstants.SOMETHING_WENT_WRONG,false));
+    }
+
 }

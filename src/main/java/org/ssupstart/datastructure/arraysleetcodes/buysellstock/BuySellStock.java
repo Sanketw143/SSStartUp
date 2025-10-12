@@ -1,7 +1,8 @@
-package org.ssupstart.datastructure.arrays.buysellstock;
+package org.ssupstart.datastructure.arraysleetcodes.buysellstock;
 
 import lombok.extern.slf4j.Slf4j;
 
+//ToDo
 @Slf4j
 public class BuySellStock {
     public static void main(String[] args) {

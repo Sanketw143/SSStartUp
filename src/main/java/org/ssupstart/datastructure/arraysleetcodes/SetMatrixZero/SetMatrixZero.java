@@ -1,7 +1,9 @@
-package org.ssupstart.datastructure.arrays.SetMatrixZero;
+package org.ssupstart.datastructure.arraysleetcodes.SetMatrixZero;
 
 import java.util.ArrayList;
 
+
+//ToDo
 public class SetMatrixZero {
     public static void main(String[] args) {
 

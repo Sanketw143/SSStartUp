@@ -1,4 +1,4 @@
-package org.ssupstart.constants;
+package org.ssupstart.ems.constants;
 
 //ToDo: Read what is utility class
 public class ExceptionsConstants {

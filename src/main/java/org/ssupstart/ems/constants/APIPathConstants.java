@@ -1,4 +1,4 @@
-package org.ssupstart.constants;
+package org.ssupstart.ems.constants;
 
 public class APIPathConstants {
     private APIPathConstants() {

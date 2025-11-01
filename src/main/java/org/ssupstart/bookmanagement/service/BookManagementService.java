@@ -19,7 +19,7 @@ public class BookManagementService {
     }
 
     public List<Book> getAllBooks() {
-        return bookManagementRepository.getAllBoooks();  // or we can use findAll method of JPA
+        return bookManagementRepository.getAllBooks();  // or we can use findAll method of JPA
     }
 
     public Book getBookById(Long id) {

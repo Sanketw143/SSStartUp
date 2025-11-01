@@ -6,7 +6,6 @@ import org.ssupstart.bookmanagement.dummylocalentity.Book;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 //Note this class represents in memory database management
 @Repository
@@ -15,7 +14,7 @@ public class BookManagementRepository {
     private final Map<Long, Book> books = new HashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(0);
 
-    public List<Book> getAllBoooks() {
+    public List<Book> getAllBooks() {
         return books.values().stream().toList();
     }
 
@@ -30,10 +29,6 @@ public class BookManagementRepository {
         }
         books.put(book.getId(), book);
         return book;
-    }
-
-    public Optional<Book> updateBook(Book book) {
-        return Optional.ofNullable(books.get(book.getId()));
     }
 
     public void deleteBook(Long id) {

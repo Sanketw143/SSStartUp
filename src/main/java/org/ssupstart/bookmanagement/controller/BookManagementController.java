@@ -24,13 +24,13 @@ public class BookManagementController {
     @GetMapping
     public List<Book> getAllBooks() {
         return bookManagementService.getAllBooks();
-    };
+    }
 
 
     @GetMapping("/{id}")  // visrlo hoto
     public Book getBookById(@PathVariable("id") Long id) {  //Eth chukun pathparam vaprla hota check difference
         return bookManagementService.getBookById(id);
-    };
+    }
 
     @PostMapping
     public ResponseEntity<Book> createNewBookEntry(@Valid @RequestBody Book book) { //@Valid visarlelo ani ResponseEntity visrlelo

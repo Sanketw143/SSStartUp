@@ -1,0 +1,214 @@
+Q1. What were the top five guidelines which you want your developers to follow?
+    1.Consistent API Design Standards (RESTful principles)
+        Follow standard HTTP methods (GET, POST, PUT, DELETE) for CRUD operations.
+        Resource naming should always be noun-based and plural.
+            /api/users/{id} ❌ /getUser
+        Maintain versioning (e.g., /api/v1/products) to ensure backward compatibility.
+        Always return standardized response structures:
+            {
+              "status": "SUCCESS",
+              "data": {...},
+              "message": "Request processed successfully"
+            }
+
+    2.Proper Exception Handling & HTTP Status Codes
+        Use global exception handler with @ControllerAdvice.
+        Map exceptions to correct HTTP status codes:
+            400 → Bad Request
+            404 → Resource Not Found
+            500 → Internal Server Error
+
+    3.Validation and Security First
+        Use @Valid + Hibernate Validator for request validation.
+        Sanitize inputs and enable Spring Security or JWT-based authentication.
+        Enforce role-based access control (RBAC) and limit open endpoints.
+
+    4.API Documentation and Contract Consistency
+        Use Swagger/OpenAPI for all microservices.
+        Document input/output models, status codes, and error responses.
+        Run Swagger contract validation in CI pipeline to prevent breaking changes.
+
+    5.Performance, Pagination, and Monitoring
+        Apply pagination for list APIs → page, size parameters
+        Implement caching (@Cacheable) for frequently accessed data.
+        Include metrics with Micrometer + Prometheus for monitoring.
+        Use asynchronous processing (@Async) for non-blocking calls.
+    6.Bonus — Cultural / Leadership Angle
+
+--------------------------------------------------------------------------------------------
+
+Q2. Vendor integration
+        We built a central Vendor Integration Layer (VIL) using Spring Boot microservices.
+        Each vendor exposed different APIs (REST, SOAP, FTP, CSV feeds).
+        To standardize, we developed adapters per vendor implementing a common interface:
+
+        API Communication & Standardization
+        Communication followed a standard contract:
+        All vendor APIs were consumed through REST templates or WebClient (reactive).
+        Request/response models were mapped to a common internal DTO to isolate vendor logic.
+        Implemented error mapping: Vendor error → standardized internal error.
+
+        Asynchronous Data Flow
+        Vendor updates (stock, price, shipment) were processed via Kafka.
+        Each vendor event topic (e.g., vendor.stock.update) was consumed by an InventorySyncService.
+
+        Security and Authentication
+        Used JWT tokens or API keys for vendor authentication.
+        Sensitive credentials (keys, secrets) were stored in AWS Secrets Manager / Vault.
+        Added rate-limiting and retry backoff to handle throttled vendor APIs.
+
+
+------------------------------------------------------------------------------------------------------
+Q3 Critical Things I Always Keep in Mind While Writing Any APIs
+    Database Interaction Optimization
+    Avoid N+1 queries → Always use fetch joins or batch fetching with JPA.
+    Use pagination (Pageable) instead of fetching full datasets.
+    Apply indexes on frequently filtered columns (like sku, vendor_id, status).
+    For read-heavy data → use read replicas or caching layer (Redis).
+
+    Caching at the Right Layer
+    Cache frequently accessed data (e.g., catalog info, vendor configs) using Spring Cache / Redis.
+    Use appropriate TTLs (time-to-live) and invalidate intelligently.
+
+    Minimize Serialization & Payload Size
+    Avoid sending unnecessary fields → use DTOs or projections.
+    Use Jackson annotations to exclude nulls and transient data.
+    Compress large responses (enable GZIP compression in Spring Boot).
+
+    Connection & Thread Pool Management
+    Tune connection pools (HikariCP) → set optimal maxPoolSize, connectionTimeout.
+    Avoid blocking I/O in controller threads.
+    Use ThreadPoolTaskExecutor with proper core/max thread settings.
+
+    Efficient Logging & Monitoring
+
+----------------------------------------------------------------------------------------------------
+
+Q4.Each microservice had flexibility to choose its database, but under controlled architectural guidelines.
+    Principle — "Own Your Data"
+    Each microservice owns its own schema and database.
+    This ensures loose coupling and independent scalability.
+
+    Data Sharing via APIs, Not DB Joins
+
+    Event-Driven Communication
+    Used Kafka for async updates → maintain eventual consistency.
+    Example: when InventoryService updates stock, it publishes inventory.updated event.
+    OrderService consumes it and updates its local cache.
+
+-----------------------------------------------------------------------------------------------------
+
+Q5. How MySQL and Elasticsearch Sync Happened
+    MySQL as Source of Truth
+
+    Event Publishing (Asynchronous Sync)
+    After successful DB commit, we published an event (via Kafka or internal queue).
+    Event payload contained minimal data like product ID and operation type (CREATE/UPDATE/DELETE).
+
+    A Kafka consumer service listened to product-events and performed:
+    Fetch latest data from MySQL
+    Transform it to the Elasticsearch index model
+    Update or delete the document in Elasticsearch
+
+    Data Consistency & Recovery
+    Sync was eventual, typically within seconds.
+    Periodic reindex jobs (nightly cron) ensured complete sync between MySQL and ES.
+
+    ✅ MySQL handled transactional integrity
+    ✅ Elasticsearch handled high-performance search & aggregation
+    ✅ Decoupled architecture improved scalability and reduced DB load
+
+--------------------------------------------------------------------------------------------------------
+Q6. what the approach was when creating a low-level design
+
+    Understand the requirements and constraints
+    Clarify functional boundaries: what exactly must the module do (inputs, outputs, success/failure)?
+    Non-functional constraints: latency, throughput, memory, persistence, fault-tolerance, security, SLA.
+    Interfaces with other systems: upstream/downstream APIs, DBs, queues, caches.
+
+    Define clear responsibilities and boundaries
+    Single Responsibility per class/service.
+    Separation of concerns: API layer → service layer → domain → repository → infra.
+    Public contract: DTOs and interfaces first — make the API explicit.
+
+    Data modeling & transactions
+    Model aggregates and consistency boundaries (what must be ACID vs eventual).
+    Transaction boundaries: prefer small, well-defined transactional units. Use @Transactional at service boundary.
+    Optimistic locking (version field) where concurrent updates happen frequently.
+
+    Error handling & retries
+    Fail-fast and meaningful errors: domain exceptions mapped to API errors.
+    Retry with backoff for transient failures (external APIs).
+    Circuit Breaker for flaky dependencies (Resilience4j / Spring Cloud Circuit Breaker).
+    DLQ for events that repeatedly fail to process.
+
+    Performance & scalability
+    Avoid heavy operations inside transactions; offload via async or queues.
+    Cache read-heavy data with TTL and explicit invalidation.
+    Use pagination, projections, and DB indices; prefer SQL projections when you don’t need full entities.
+    Profile hotspots and design for horizontal scale (stateless services).
+
+    Observability & testing
+
+    Security & validation
+
+    API & backward compatibility
+
+    Write API contract + DTOs (so callers know the shape).
+    Sketch class diagram (services, repositories, adapters).
+    Identify transactions & consistency model (ACID vs eventual).
+    Pick patterns (Adapter for vendors, Strategy for algorithms).
+    Write critical path pseudocode and one end-to-end flow.
+    Define failure modes and recovery (retries, DLQ, rollback).
+    Add metrics/traces/log points in the design doc.
+    Review with peers and iterate (focus on edge-cases and observability).
+
+Implementation decisions of LLD
+    Java 8 / Spring Boot (v2.x) – Core framework for REST APIs, DI, and configuration.
+
+    Spring Data JPA (Hibernate) – For ORM and database interaction (MySQL).
+    Kafka – For asynchronous event-driven communication between microservices.
+    Elasticsearch – For indexing and search operations.
+    Redis – For caching and reducing DB load.
+    Lombok – To reduce boilerplate code.
+    MapStruct – For DTO ↔ Entity conversions.
+    Resilience4j – For retries, rate-limiting, and circuit breakers.
+    Micrometer + Prometheus + Grafana – For metrics and observability.
+
+    Controller → Service → Repository → Adapter/Client → External Systems
+
+    -----------------------------------------------------------------------------------------------------
+
+    Load balancer
+    Cache (Redis / Memcached)
+    Message queues (Kafka, RabbitMQ)
+    Database scaling (sharding, replication)
+    CDNs
+    API Gateways
+    Microservices
+
+    1. Ask the requirements (functional & non-functional)
+    2. Define the APIs end-to-end
+    3. Choose the database(s) and justify why
+    4. Handle scaling (read/write separation, caching, partitioning)
+    5. Discuss bottlenecks and how you plan to fix them
+    6. Mention trade-offs and alternatives
+
+    System design has no perfect answers. There are only better answers for the given context.
+    Learning takes time. You can’t finish system design in 3 days. It took me 6 months of real practice.
+    Start small. Don’t go for “design YouTube” on day 1. Begin with “design a URL shortener”.
+    It’s 70% thinking, 30% tech. Tools will change. But understanding patterns (like event-driven architecture) stays valuable forever.
+
+
+
+    Step 1: Learn the Basics
+    Read free system design blogs and watch the Grokking the System Design videos
+    Understand how caching, databases, and networks work
+    Step 2: Build Example Designs
+    Design Instagram, Netflix, WhatsApp — draw architecture diagrams yourself
+    Explain them verbally like you’re teaching someone (even if it’s your wall)
+    Step 3: Mock Interviews
+    Practice with friends or platforms like Pramp
+    Record yourself answering a prompt
+    Step 4: Go Back and Improve
+    Each design you do, ask “What would break if 10x users came?”

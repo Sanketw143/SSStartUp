@@ -39,11 +39,11 @@ WORKDIR /app
 # Copy the executable JAR from the builder stage to the final image.
 # The JAR is copied from `/app/build/libs/Billing-0.0.1-SNAPSHOT.jar` in the builder stage
 # and renamed to `app.jar` in the current stage for simplicity.
-COPY --from=builder /app/build/libs/Billing-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/SSUpStart-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port on which your Spring Boot application will listen.
 # Based on your application.properties, this is 9090.
-EXPOSE 9090
+EXPOSE 9579
 
 # Define the command to run your application when the container starts.
 # `java -jar app.jar` executes the Spring Boot application.

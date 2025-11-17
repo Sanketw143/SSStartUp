@@ -3,12 +3,12 @@ package org.ssupstart.ems.exceptions;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.ssupstart.ems.constants.ExceptionsConstants;
 import org.ssupstart.ems.responses.APIResponse;
 
-@ControllerAdvice
+@RestControllerAdvice("org.ssupstart.ems")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)

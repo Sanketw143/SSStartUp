@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.twilio.sdk:twilio:9.14.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
     runtimeOnly 'com.h2database:h2' // For in-memory DB during development
 
     compileOnly 'org.projectlombok:lombok'

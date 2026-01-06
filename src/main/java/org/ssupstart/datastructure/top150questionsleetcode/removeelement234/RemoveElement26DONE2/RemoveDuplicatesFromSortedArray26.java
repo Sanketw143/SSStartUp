@@ -1,4 +1,4 @@
-package org.ssupstart.datastructure.first1.twopointeralgo.leetcodes.removeduplicates26.baki;
+package org.ssupstart.datastructure.top150questionsleetcode.removeelement234.RemoveElement26DONE2;
 
 
 //Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once.
